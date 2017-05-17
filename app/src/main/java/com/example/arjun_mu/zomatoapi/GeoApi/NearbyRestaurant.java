@@ -18,4 +18,7 @@ public class NearbyRestaurant {
         this.restaurant = restaurant;
     }
 
+
+
+
 }
