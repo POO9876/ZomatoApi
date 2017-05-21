@@ -42,11 +42,15 @@ public class MainActivity extends AppCompatActivity {
     private RestaurantAdapter mAdapter;
     List<NearbyRestaurant> nearbyRestaurants;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+
+
         //     btnShowLocation= (Button) findViewById(R.id.mybutton);
 
 //        btnShowLocation.setOnClickListener(new View.OnClickListener() {
