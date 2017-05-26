@@ -1,5 +1,5 @@
 
-package com.example.arjun_mu.zomatoapi.GeoApi;
+package com.example.arjun_mu.zomatoapi.GeoClass;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

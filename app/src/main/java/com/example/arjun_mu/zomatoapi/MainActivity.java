@@ -1,5 +1,7 @@
 package com.example.arjun_mu.zomatoapi;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -17,10 +18,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.arjun_mu.zomatoapi.CustomVolley.GsonRequest;
-import com.example.arjun_mu.zomatoapi.GeoApi.GeoCode;
-import com.example.arjun_mu.zomatoapi.GeoApi.Location_;
-import com.example.arjun_mu.zomatoapi.GeoApi.NearbyRestaurant;
-import com.example.arjun_mu.zomatoapi.GeoApi.Restaurant;
+import com.example.arjun_mu.zomatoapi.GeoClass.GeoCode;
+import com.example.arjun_mu.zomatoapi.GeoClass.Location_;
+import com.example.arjun_mu.zomatoapi.GeoClass.NearbyRestaurant;
+import com.example.arjun_mu.zomatoapi.GeoClass.Restaurant;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -34,50 +35,38 @@ public class MainActivity extends AppCompatActivity {
     // Button btnShowLocation;
 
     private static final String TAG = "MainActivity";
-    // GPSTracker class
-    GPSTracker gps;
+
     RecyclerView recyclerView;
 
     List<NearbyRestaurant> nearbyRest;
-    private RestaurantAdapter mAdapter;
     List<NearbyRestaurant> nearbyRestaurants;
-
-
+    private RestaurantAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPref.init(getApplicationContext());
+        // SharedPref.write(SharedPref.NAME, "XXXX");//save string in shared preference.
+        // SharedPref.write(SharedPref.AGE, "25");//save int in shared preference.
+
+        // String name = SharedPref.read(SharedPref.NAME, null);//read string in shared preference.
+        // String age = SharedPref.read(SharedPref.AGE, "0");//read int in shared preference.
+//        SharedPref.write(SharedPref.IS_SELECT, true);//save boolean in shared preference.
+//        boolean isSelect = SharedPref.read(SharedPref.IS_SELECT, false);//read boolean in shared preference.
 
 
-        //     btnShowLocation= (Button) findViewById(R.id.mybutton);
+        SharedPreferences sharedPreferences = SharedPref.getmSharedPref();
+        if (!sharedPreferences.contains(SharedPref.IS_SELECT)) {
+            SharedPref.write(SharedPref.IS_SELECT, "first");
+        } else {
+            SharedPref.write(SharedPref.IS_SELECT, "second");
 
-//        btnShowLocation.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//                // create class object
-//                gps = new GPSTracker(MainActivity.this);
-//
-//                // check if GPS enabled
-//                if(gps.canGetLocation()){
-//
-//                    double latitude = gps.getLatitude();
-//                    double longitude = gps.getLongitude();
-//
-//                    // \n is for new line
-//                    Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
-//                }else{
-//                    // can't get location
-//                    // GPS or Network is not enabled
-//                    // Ask user to enable GPS/network in settings
-//                    gps.showSettingsAlert();
-//                }
-//
-//            }
-//        });
+        }
+
+        String name = SharedPref.read(SharedPref.IS_SELECT, null);
+        Log.d(TAG, "onCreate: " + name);
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -86,7 +75,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 NearbyRestaurant nearbyRestaurant = nearbyRestaurants.get(position);
                 Restaurant restaurant = nearbyRestaurant.getRestaurant();
-                Toast.makeText(getApplicationContext(), restaurant.getName() + "", Toast.LENGTH_SHORT).show();
+                Location_ location = restaurant.getLocation();
+                String lat = location.getLatitude();
+                String log = location.getLongitude();
+
+                Intent intent=new Intent(getApplicationContext(),MapActivity.class);
+                intent.putExtra("lat",lat);
+                intent.putExtra("log",log);
+                startActivity(intent);
+
+               // Toast.makeText(getApplicationContext(), restaurant.getName() + "", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -153,12 +151,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         // Access the RequestQueue through your singleton class.
-      //  VolleySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+        //  VolleySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
 
         customResponseObject();
     }
 
-        private void customResponseObject() {
+    private void customResponseObject() {
 
         GsonRequest gsonRequest = new GsonRequest(ApiConstant.GeoCode, GeoCode.class, null, new Response.Listener() {
             @Override
@@ -166,8 +164,8 @@ public class MainActivity extends AppCompatActivity {
                 // Handle response
 
 
-                GeoCode geocode= (GeoCode) response;
-                nearbyRestaurants =  geocode.getNearbyRestaurants();
+                GeoCode geocode = (GeoCode) response;
+                nearbyRestaurants = geocode.getNearbyRestaurants();
 
 
                 mAdapter = new RestaurantAdapter(nearbyRestaurants, getApplicationContext());
@@ -187,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     Location_ location = restaurant.getLocation();
                     Log.d(TAG, "onResponse: " + restaurant.getName() + " lat:" + location.getLatitude() + " long :" + location.getLongitude());
                 }
-                Log.d(TAG, "onResponse: from my custom"+response);
+                Log.d(TAG, "onResponse: from my custom" + response);
 
             }
         }, new Response.ErrorListener() {

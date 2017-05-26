@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.example.arjun_mu.zomatoapi.GeoApi.NearbyRestaurant;
-import com.example.arjun_mu.zomatoapi.GeoApi.Restaurant;
+import com.example.arjun_mu.zomatoapi.GeoClass.NearbyRestaurant;
+import com.example.arjun_mu.zomatoapi.GeoClass.Restaurant;
 
 import java.util.List;
 
